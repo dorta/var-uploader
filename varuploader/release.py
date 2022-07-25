@@ -46,19 +46,50 @@ class NewReleaseWindow(Gtk.Box):
         self.changelog_page.write_changelog_entries()
         self.sources_page.write_sources_entries()
 
-        yaml_dict = {'Release': self.release_page.release_dict,
-                     'Changes': self.changelog_page.changelog_dict,
-                     'Sources': self.sources_page.sources_dict}
-
-        with open('release_changelog.yaml', 'a') as f:
-            yaml.dump(yaml_dict, f, default_flow_style=False, explicit_start=True, sort_keys=False)
+        return {'Release': self.release_page.release_dict,
+                'Changes': self.changelog_page.changelog_dict,
+                'Sources': self.sources_page.sources_dict}
 
     def on_back_clicked(self, button):
         self._parent.main_window.show_all()
         self.hide()
 
     def on_export_release_clicked(self, button):
-        self._export_yml()
+        yaml_dict = self._export_yml()
+
+        dialog = ConfirmationDialog(self._parent, yaml_dict)
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            with open('release_changelog.yaml', 'a') as f:
+                yaml.dump(yaml_dict, f, default_flow_style=False, explicit_start=True, sort_keys=False)
+        elif response == Gtk.ResponseType.CANCEL:
+            pass
+
+        dialog.destroy()
+
+
+class ConfirmationDialog(Gtk.Dialog):
+    def __init__(self, parent, yaml_dict):
+        super().__init__(title="Release Changelog Preview", transient_for=parent, flags=0)
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                         Gtk.STOCK_OK, Gtk.ResponseType.OK)
+
+        window_size = parent.get_size()
+        self.set_default_size(*window_size)
+
+        sw = Gtk.ScrolledWindow()
+        sw.set_hexpand(True)
+        sw.set_vexpand(True)
+        label_box = Gtk.Box()
+
+        label = Gtk.Label(label=yaml.dump(yaml_dict, default_flow_style=False, sort_keys=False).replace("  ", "\t"))
+        label_box.pack_start(label, False, True, 10)
+        sw.add(label_box)
+
+        box = self.get_content_area()
+        box.add(sw)
+        self.show_all()
 
 
 class ReleasePage(Gtk.Box):
