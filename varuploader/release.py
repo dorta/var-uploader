@@ -62,7 +62,8 @@ class NewReleaseWindow(Gtk.Box):
 
         if response == Gtk.ResponseType.OK:
             with open('release_changelog.yaml', 'a') as f:
-                yaml.dump(yaml_dict, f, default_flow_style=False, explicit_start=True, sort_keys=False)
+                yaml.dump(yaml_dict, f,  Dumper=IndentDumper, default_flow_style=False,
+                          explicit_start=True, sort_keys=False)
         elif response == Gtk.ResponseType.CANCEL:
             pass
 
@@ -83,7 +84,7 @@ class ConfirmationDialog(Gtk.Dialog):
         sw.set_vexpand(True)
         label_box = Gtk.Box()
 
-        label = Gtk.Label(label=yaml.dump(yaml_dict, default_flow_style=False, sort_keys=False).replace("  ", "\t"))
+        label = Gtk.Label(label=yaml.dump(yaml_dict, Dumper=IndentDumper, sort_keys=False).replace("  ", "\t"))
         label_box.pack_start(label, False, True, 10)
         sw.add(label_box)
 
@@ -280,6 +281,11 @@ class SourcesPage(Gtk.Box):
                     self.repo_dict[target][subsection] = self.repo_entries[target][subsection].get_text()
 
             return self.repo_dict
+
+
+class IndentDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, indentless=False):
+        return super(IndentDumper, self).increase_indent(flow, False)
 
 
 def add_notebook_page(notebook, page_object, page_name):
