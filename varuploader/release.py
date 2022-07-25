@@ -116,7 +116,7 @@ class ReleasePage(Gtk.Box):
             if self._release_info[info]:
                 entry.set_text(self._release_info[info])
             else:
-                entry.set_text(f"Add {info.lower()}...")
+                entry.set_placeholder_text(f"Add {info.lower()}...")
             self.release_entries.append(entry)
             hbox.pack_start(label, False, False, 0)
             hbox.pack_start(entry, True, True, 0)
@@ -201,7 +201,7 @@ class ChangelogPage(Gtk.Box):
             sw_hbox.set_margin_left(10)
             sw_hbox.set_margin_right(10)
             entry = Gtk.Entry()
-            entry.set_text("Add changelog...")
+            entry.set_placeholder_text("Add changelog...")
             self.updates_entries[target].append(entry)
             rm_button = Gtk.Button.new_with_label("Remove")
             rm_button.connect("clicked", self.on_rm_button_clicked, sw_hbox, entry, target, pos)
@@ -276,7 +276,7 @@ class SourcesPage(Gtk.Box):
             source_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             label = Gtk.Label(label=f"{subsection:>16}\t")
             entry = Gtk.Entry()
-            entry.set_text(f"Add {subsection.lower()}...")
+            entry.set_placeholder_text(f"Add {subsection.lower()}...")
             self.repo_entries[target][subsection] = entry
             source_hbox.pack_start(label, False, False, 0)
             source_hbox.pack_start(entry, True, True, 0)
