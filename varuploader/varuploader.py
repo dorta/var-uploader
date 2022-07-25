@@ -43,7 +43,7 @@ from welcome import MainWindow
 
 
 class VarUploaderGUI(Gtk.Window):
-    def __init__(self):
+    def __init__(self, file_size, file_sha224):
         super(VarUploaderGUI, self).__init__(title=WINDOW_T)
         self.set_default_size(WINDOW_W, WINDOW_H)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -52,7 +52,7 @@ class VarUploaderGUI(Gtk.Window):
         self.add(container)
 
         self.main_window = MainWindow(self)
-        self.new_release_window = NewReleaseWindow(self)
+        self.new_release_window = NewReleaseWindow(self, file_size=file_size, file_sha224=file_sha224)
 
         container.add(self.main_window)
         container.add(self.new_release_window)
@@ -69,10 +69,10 @@ def main():
     sha224_hash = calculate_sha224_hash(args.image)
 
     sys.stdout.write("Starting User Interface\n")
-    start_ui()
+    start_ui(size, sha224_hash)
 
-def start_ui():
-    app = VarUploaderGUI()
+def start_ui(file_size, file_sha224):
+    app = VarUploaderGUI(file_size, file_sha224)
     app.connect('delete-event', Gtk.main_quit)
     app.show()
     app.main_window.show_all()

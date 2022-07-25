@@ -10,9 +10,13 @@ import yaml
 
 
 class NewReleaseWindow(Gtk.Box):
-    def __init__(self, parent):
+    def __init__(self, parent, version=None, date=None, yocto=None, android=None,
+                 file_path=None, file_sha224=None, file_size=None):
         super().__init__()
         self._parent = parent
+        self._info = {"Version": version, "Date": date, "Yocto": yocto,
+                      "Android": android, "Path": file_path,
+                      "SHA224": file_sha224, "Size": file_size}
 
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         main_box.set_hexpand(True)
@@ -26,7 +30,7 @@ class NewReleaseWindow(Gtk.Box):
         notebook.set_hexpand(True)
         notebook.set_vexpand(True)
 
-        self.release_page = ReleasePage()
+        self.release_page = ReleasePage(self._info)
         self.changelog_page = ChangelogPage()
         self.sources_page = SourcesPage()
 
@@ -94,9 +98,9 @@ class ConfirmationDialog(Gtk.Dialog):
 
 
 class ReleasePage(Gtk.Box):
-    def __init__(self):
+    def __init__(self, release_info):
         super().__init__()
-        self.release_info = ["Version", "Date", "Yocto", "Android", "Path", "SHA224", "Size"]
+        self._release_info = release_info
         self.release_entries = []
         self.release_dict = {}
 
@@ -105,18 +109,21 @@ class ReleasePage(Gtk.Box):
         vbox.set_vexpand(True)
         self.add(vbox)
 
-        for info in self.release_info:
+        for info in self._release_info:
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20)
             label = Gtk.Label(label=f"{info:>12}\t")
             entry = Gtk.Entry()
-            entry.set_text(f"Add {info.lower()}...")
+            if self._release_info[info]:
+                entry.set_text(self._release_info[info])
+            else:
+                entry.set_text(f"Add {info.lower()}...")
             self.release_entries.append(entry)
             hbox.pack_start(label, False, False, 0)
             hbox.pack_start(entry, True, True, 0)
             vbox.pack_start(hbox, False, True, 0)
 
     def write_release_entries(self):
-        for info, entry in zip(self.release_info, self.release_entries):
+        for info, entry in zip(self._release_info, self.release_entries):
             self.release_dict[info] = entry.get_text()
 
 
