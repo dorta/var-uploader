@@ -25,6 +25,8 @@ class NewReleaseWindow(Gtk.Box):
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         main_box.set_hexpand(True)
         main_box.set_vexpand(True)
+        main_box.set_margin_left(20)
+        main_box.set_margin_right(20)
         self.add(main_box)
 
         back_button = Gtk.Button.new_with_label("Back")
@@ -65,17 +67,26 @@ class NewReleaseWindow(Gtk.Box):
     def on_export_release_clicked(self, button):
         yaml_dict = self._export_yml()
 
-        dialog = ConfirmationDialog(self._parent, yaml_dict)
-        response = dialog.run()
+        confirmation_dialog = ConfirmationDialog(self._parent, yaml_dict)
+        confirmation_response = confirmation_dialog.run()
 
-        if response == Gtk.ResponseType.OK:
-            with open('release_changelog.yaml', 'a') as f:
-                yaml.dump(yaml_dict, f,  Dumper=IndentDumper, default_flow_style=False,
-                          explicit_start=True, sort_keys=False)
-        elif response == Gtk.ResponseType.CANCEL:
-            pass
+        if confirmation_response == Gtk.ResponseType.OK:
+            login_dialog = LoginDialog(confirmation_dialog)
+            login_response = login_dialog.run()
 
-        dialog.destroy()
+            if login_response == Gtk.ResponseType.OK:
+                """
+                    TODO: Validate FTP credentials and upload Recovery SD card + changelog file
+                """
+
+                with open('release_changelog.yaml', 'a') as f:
+                    yaml.dump(yaml_dict, f,  Dumper=IndentDumper, default_flow_style=False,
+                            explicit_start=True, sort_keys=False)
+            else:
+                """ TODO """
+
+            login_dialog.destroy()
+        confirmation_dialog.destroy()
 
 
 class ConfirmationDialog(Gtk.Dialog):
@@ -101,6 +112,45 @@ class ConfirmationDialog(Gtk.Dialog):
         self.show_all()
 
 
+class LoginDialog(Gtk.Dialog):
+    def __init__(self, parent):
+        super().__init__(title="Login", transient_for=parent, flags=0)
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                         Gtk.STOCK_OK, Gtk.ResponseType.OK)
+
+        self.set_default_size(480, 320)
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox.set_hexpand(True)
+        vbox.set_vexpand(True)
+        vbox.set_margin_left(10)
+        vbox.set_margin_right(10)
+        vbox.set_margin_top(10)
+
+        label = Gtk.Label(label="Enter FTP credentials")
+        vbox.pack_start(label, False, True, 0)
+
+        username_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        username_label =  Gtk.Label(label="Username:\t")
+        username_entry = Gtk.Entry()
+        username_entry.set_visibility(False)
+        username_hbox.pack_start(username_label, False, True, 0)
+        username_hbox.pack_start(username_entry, True, True, 0)
+        vbox.pack_start(username_hbox, False, True, 0)
+
+        passwd_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        passwd_label =  Gtk.Label(label="Password:\t")
+        passwd_entry = Gtk.Entry()
+        passwd_entry.set_visibility(False)
+        passwd_hbox.pack_start(passwd_label, False, True, 0)
+        passwd_hbox.pack_start(passwd_entry, True, True, 0)
+        vbox.pack_start(passwd_hbox, False, True, 0)
+
+        box = self.get_content_area()
+        box.add(vbox)
+        self.show_all()
+
+
 class ReleasePage(Gtk.Box):
     def __init__(self, release_info):
         super().__init__()
@@ -108,9 +158,12 @@ class ReleasePage(Gtk.Box):
         self.release_entries = []
         self.release_dict = {}
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         vbox.set_hexpand(True)
         vbox.set_vexpand(True)
+        vbox.set_margin_left(10)
+        vbox.set_margin_right(10)
+        vbox.set_margin_top(5)
         self.add(vbox)
 
         for info in self._release_info:
@@ -119,6 +172,7 @@ class ReleasePage(Gtk.Box):
             entry = Gtk.Entry()
             if self._release_info[info]:
                 entry.set_text(self._release_info[info])
+                entry.set_editable(False)
             else:
                 entry.set_placeholder_text(f"Add {info.lower()}...")
             self.release_entries.append(entry)
@@ -160,6 +214,9 @@ class ChangelogPage(Gtk.Box):
             self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
             self.main_box.set_hexpand(True)
             self.main_box.set_vexpand(True)
+            self.main_box.set_margin_left(10)
+            self.main_box.set_margin_right(10)
+            self.main_box.set_margin_top(5)
             self.add(self.main_box)
 
             self.sw_vbox = []
@@ -250,6 +307,9 @@ class SourcesPage(Gtk.Box):
             self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
             self.main_box.set_hexpand(True)
             self.main_box.set_vexpand(True)
+            self.main_box.set_margin_left(10)
+            self.main_box.set_margin_right(10)
+            self.main_box.set_margin_top(5)
             self.add(self.main_box)
 
             self._add_source_section('U-Boot')
