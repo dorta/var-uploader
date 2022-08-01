@@ -32,47 +32,31 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-import sys
 
-from args import args_parser
 from config import *
 from release import NewReleaseWindow
-from utils import calculate_sha224_hash
-from utils import get_current_date, get_file_size
 from welcome import MainWindow
 
 
 class VarUploaderGUI(Gtk.Window):
-    def __init__(self, file_size, file_sha224):
+    def __init__(self):
         super(VarUploaderGUI, self).__init__(title=WINDOW_T)
         self.set_default_size(WINDOW_W, WINDOW_H)
         self.set_position(Gtk.WindowPosition.CENTER)
 
-        container = Gtk.Box()
-        self.add(container)
+        self.con = Gtk.Box()
+        self.add(self.con)
 
         self.main_window = MainWindow(self)
-        self.new_release_window = NewReleaseWindow(self, file_size=file_size, file_sha224=file_sha224)
+        self.new_release_window = NewReleaseWindow(self)
 
-        container.add(self.main_window)
-        container.add(self.new_release_window)
-        container.show()
+        self.con.add(self.main_window)
+        self.con.add(self.new_release_window)
+        self.con.show()
 
 
 def main():
-    parser, args = args_parser()
-    if len(sys.argv) == 1:
-        sys.exit(parser.print_help())
-
-    changelog_file_name = MX8_YAML_CHANGELOG_FILES[args.som]
-    size = get_file_size(args.image)
-    sha224_hash = calculate_sha224_hash(args.image)
-
-    sys.stdout.write("Starting User Interface\n")
-    start_ui(size, sha224_hash)
-
-def start_ui(file_size, file_sha224):
-    app = VarUploaderGUI(file_size, file_sha224)
+    app = VarUploaderGUI()
     app.connect('delete-event', Gtk.main_quit)
     app.show()
     app.main_window.show_all()

@@ -1,22 +1,26 @@
 # Copyright 2022 Variscite LTD
 # SPDX-License-Identifier: BSD-3-Clause
 
-from platform import release
 import gi
 gi.require_version('Gtk',  "3.0")
 from gi.repository import Gtk
 
+from utils import calculate_sha224_hash
+from utils import get_current_date, get_file_size
 import yaml
 
 
 class NewReleaseWindow(Gtk.Box):
-    def __init__(self, parent, version=None, date=None, yocto=None, android=None,
-                 file_path=None, file_sha224=None, file_size=None):
+    def __init__(self, parent, file_path=None):
         super().__init__()
         self._parent = parent
-        self._info = {"Version": version, "Date": date, "Yocto": yocto,
-                      "Android": android, "Path": file_path,
-                      "SHA224": file_sha224, "Size": file_size}
+        self._date = get_current_date("%m/%d/%Y")
+        self._file_path = file_path
+        self._file_sha224 = None if not file_path else calculate_sha224_hash(file_path)
+        self._file_size = None if not file_path else get_file_size(file_path)
+        self._info = {"Version": None, "Date": self._date, "Yocto": None,
+                      "Android": None, "Path": None,
+                      "SHA224": self._file_sha224, "Size": self._file_size}
 
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         main_box.set_hexpand(True)
