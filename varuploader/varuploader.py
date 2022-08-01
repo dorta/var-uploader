@@ -28,12 +28,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from config import *
+from menubar import MenuBar
 from release import NewReleaseWindow
 from welcome import MainWindow
 
@@ -44,22 +44,27 @@ class VarUploaderGUI(Gtk.Window):
         self.set_default_size(WINDOW_W, WINDOW_H)
         self.set_position(Gtk.WindowPosition.CENTER)
 
+        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.add(main_box)
+
+        menu_bar = MenuBar(self)
+        main_box.pack_start(menu_bar, False, False, 0)
+
         self.con = Gtk.Box()
-        self.add(self.con)
+        main_box.pack_start(self.con, True, True, 0)
 
         self.main_window = MainWindow(self)
         self.new_release_window = NewReleaseWindow(self)
 
         self.con.add(self.main_window)
         self.con.add(self.new_release_window)
-        self.con.show()
+        self.show_all()
+        self.new_release_window.hide()
 
 
 def main():
     app = VarUploaderGUI()
     app.connect('delete-event', Gtk.main_quit)
-    app.show()
-    app.main_window.show_all()
     Gtk.main()
 
 if __name__ == "__main__":
