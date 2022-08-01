@@ -10,6 +10,11 @@ WINDOW_H = 720
 
 UNITS = ("B", "KiB", "MiB", "GiB")
 
+SOFTWARE = "Software"
+OS_YOCTO = "yocto"
+OS_DEBIAN = "debian"
+OS_B2QT = "b2qt"
+
 MX8_SOM_DT_8M       = "DART-MX8M"
 MX8_SOM_DT_8M_MINI  = "DART-MX8M-MINI"
 MX8_SOM_DT_8M_PLUS  = "DART-MX8M-PLUS"
