@@ -31,6 +31,9 @@ def get_file_size(file_name):
     size_fmt = f"{s} {UNITS[i]} ({size_bytes:,} bytes)"
     return size_fmt
 
+def check_image_file_extension(image_name):
+    return True if image_name.endswith("img.gz") else False
+
 def _basename(full_path):
     return os.path.basename(os.path.normpath(full_path))
 
